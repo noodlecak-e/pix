@@ -1,17 +1,16 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/noodlecak-e/pix/internal/resources/event"
 )
 
 func main() {
+	eventHandler := event.NewHandler()
+
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+
+	r.POST("/event", eventHandler.Create)
+
 	r.Run()
 }
