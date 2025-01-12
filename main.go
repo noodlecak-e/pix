@@ -10,7 +10,7 @@ func main() {
 
 	r := gin.Default()
 
-	r.POST("/event", eventHandler.Create)
+	r.POST("/events", eventHandler.Create)
 
 	r.Run()
 }
