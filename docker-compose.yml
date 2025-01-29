@@ -14,5 +14,7 @@ services:
       - psql-data:/var/lib/postgresql/data
       - ./db/schema/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./db/schema/events.sql:/docker-entrypoint-initdb.d/events.sql
+      - ./db/schema/users.sql:/docker-entrypoint-initdb.d/users.sql
+      - ./db/schema/pictures.sql:/docker-entrypoint-initdb.d/pictures.sql
 volumes:
   psql-data:

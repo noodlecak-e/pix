@@ -9,8 +9,6 @@ import (
 )
 
 type CreateRequest struct {
-	EventID  string `json:"event_id" binding:"required"`
-	UserID   string `json:"user_id" binding:"required"`
 	ImageB64 string `json:"image_base64" binding:"required"`
 }
 
@@ -24,7 +22,7 @@ func (e *Handler) Create(ctx *gin.Context) {
 	}
 
 	var exists bool
-	if err := e.db.Model(&models.Event{}).Select("count(*) > 0").Where("id = ?", req.EventID).Find(&exists).Error; err != nil {
+	if err := e.db.Model(&models.Event{}).Select("count(*) > 0").Where("id = ?", ctx.Param("event_id")).Find(&exists).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -37,7 +35,7 @@ func (e *Handler) Create(ctx *gin.Context) {
 		return
 	}
 
-	if err := e.db.Model(&models.User{}).Select("count(*) > 0").Where("id = ?", req.UserID).Find(&exists).Error; err != nil {
+	if err := e.db.Model(&models.User{}).Select("count(*) > 0").Where("id = ?", ctx.Param("user_id")).Find(&exists).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -51,10 +49,10 @@ func (e *Handler) Create(ctx *gin.Context) {
 	}
 
 	newPicture := models.Picture{
-		ID:       uuid.New().String(),
-		EventID:  req.EventID,
-		UserID:   req.UserID,
-		ImageB64: req.ImageB64,
+		ID:          uuid.New().String(),
+		EventID:     ctx.Param("event_id"),
+		UserID:      ctx.Param("user_id"),
+		ImageBase64: req.ImageB64,
 	}
 
 	tx := e.db.Create(&newPicture)
