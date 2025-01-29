@@ -26,7 +26,13 @@ func (e *Handler) Create(ctx *gin.Context) {
 		Name: req.Name,
 	}
 
-	e.db.Create(&newEvent)
+	tx := e.db.Create(&newEvent)
+	if tx.Error != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": tx.Error.Error(),
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "created event!",

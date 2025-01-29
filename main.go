@@ -22,6 +22,7 @@ func main() {
 	r := gin.Default()
 
 	r.POST("/events", eventHandler.Create)
+	r.GET("/events/:id", eventHandler.Get)
 
 	r.Run()
 }
