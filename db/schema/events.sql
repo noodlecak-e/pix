@@ -1,6 +1,7 @@
 CREATE TABLE events (
     id VARCHAR(36),
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
+    name VARCHAR(255),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP
 );

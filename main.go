@@ -11,13 +11,13 @@ import (
 
 func main() {
 	dsn := "host=localhost user=pix_user password=pix_pass dbname=pix port=5432 sslmode=disable"
-	_, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println(err.Error())
 		panic("failed to connect database")
 	}
 
-	eventHandler := event.NewHandler()
+	eventHandler := event.NewHandler(db)
 
 	r := gin.Default()
 

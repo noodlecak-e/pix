@@ -1,7 +1,13 @@
 package event
 
-type EventHandler struct{}
+import "gorm.io/gorm"
 
-func NewHandler() *EventHandler {
-	return &EventHandler{}
+type Handler struct {
+	db *gorm.DB
+}
+
+func NewHandler(db *gorm.DB) *Handler {
+	return &Handler{
+		db: db,
+	}
 }
