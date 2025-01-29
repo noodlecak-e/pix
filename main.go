@@ -5,6 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/noodlecak-e/pix/internal/resources/event"
+	"github.com/noodlecak-e/pix/internal/resources/picture"
+	"github.com/noodlecak-e/pix/internal/resources/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -17,12 +19,18 @@ func main() {
 		panic("failed to connect database")
 	}
 
-	eventHandler := event.NewHandler(db)
-
 	r := gin.Default()
 
+	eventHandler := event.NewHandler(db)
 	r.POST("/events", eventHandler.Create)
 	r.GET("/events/:id", eventHandler.Get)
+
+	userHandler := user.NewHandler(db)
+	r.POST("/users", userHandler.Create)
+	r.GET("/users/:id", userHandler.Get)
+
+	pictureHandler := picture.NewHandler(db)
+	r.POST("/pictures", pictureHandler.Create)
 
 	r.Run()
 }
