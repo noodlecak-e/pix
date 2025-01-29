@@ -1,15 +1,18 @@
-version: '3.9'
+version: '3.8'
 
 services:
   db:
-    image: postgres
+    image: postgres:latest
     restart: always
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: pix_user
+      POSTGRES_PASSWORD: pix_pass
       POSTGRES_DB: pix
-    volumes:
-      - ./db-data:/var/lib/postgresql/data
-      - ./db/schema:/docker-entrypoint-initdb.d
     ports:
       - 5432:5432
+    volumes:
+      - psql-data:/var/lib/postgresql/data
+      - ./db/schema/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/schema/events.sql:/docker-entrypoint-initdb.d/events.sql
+volumes:
+  psql-data:
