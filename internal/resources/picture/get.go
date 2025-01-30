@@ -4,18 +4,15 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/noodlecak-e/pix/internal/models"
+	"github.com/noodlecak-e/pix/pkg"
 )
 
 func (e *Handler) Get(ctx *gin.Context) {
 	id := ctx.Param("picture_id")
 
-	var picture models.Picture
-	tx := e.db.First(&picture, "id = ?", id)
-	if tx.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": tx.Error.Error(),
-		})
+	picture, err := e.repository.GetPictureByID(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, pkg.ErrorResponse(err))
 		return
 	}
 

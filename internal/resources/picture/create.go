@@ -1,11 +1,13 @@
 package picture
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/noodlecak-e/pix/internal/models"
+	"github.com/noodlecak-e/pix/pkg"
 )
 
 type CreateRequest struct {
@@ -15,51 +17,43 @@ type CreateRequest struct {
 func (e *Handler) Create(ctx *gin.Context) {
 	var req CreateRequest
 	if err := ctx.BindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse(err))
 		return
 	}
 
-	var exists bool
-	if err := e.db.Model(&models.Event{}).Select("count(*) > 0").Where("id = ?", ctx.Param("event_id")).Find(&exists).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+	eventID := ctx.Param("event_id")
+	userID := ctx.Param("user_id")
+
+	eventExists, err := e.repository.EventExists(eventID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, pkg.ErrorResponse(err))
 		return
 	}
-	if !exists {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": "event not found",
-		})
+	if !eventExists {
+		ctx.JSON(http.StatusNotFound, pkg.ErrorResponse(errors.New("event not found")))
 		return
 	}
 
-	if err := e.db.Model(&models.User{}).Select("count(*) > 0").Where("id = ?", ctx.Param("user_id")).Find(&exists).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+	userExists, err := e.repository.UserExists(userID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, pkg.ErrorResponse(err))
 		return
 	}
-	if !exists {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": "user not found",
-		})
+	if !userExists {
+		ctx.JSON(http.StatusNotFound, pkg.ErrorResponse(errors.New("user not found")))
 		return
 	}
 
 	newPicture := models.Picture{
 		ID:          uuid.New().String(),
-		EventID:     ctx.Param("event_id"),
-		UserID:      ctx.Param("user_id"),
+		EventID:     eventID,
+		UserID:      userID,
 		ImageBase64: req.ImageB64,
 	}
 
-	tx := e.db.Create(&newPicture)
-	if tx.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": tx.Error.Error(),
-		})
+	newPicture, err = e.repository.CreatePicture(newPicture)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, pkg.ErrorResponse(err))
 		return
 	}
 

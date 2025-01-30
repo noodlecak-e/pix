@@ -1,13 +1,13 @@
 package picture
 
-import "gorm.io/gorm"
+import "github.com/noodlecak-e/pix/internal/repository"
 
 type Handler struct {
-	db *gorm.DB
+	repository repository.Repository
 }
 
-func NewHandler(db *gorm.DB) *Handler {
+func NewHandler(repository repository.Repository) *Handler {
 	return &Handler{
-		db: db,
+		repository: repository,
 	}
 }

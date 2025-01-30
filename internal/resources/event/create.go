@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/noodlecak-e/pix/internal/models"
+	"github.com/noodlecak-e/pix/pkg"
 )
 
 type CreateRequest struct {
@@ -15,9 +16,7 @@ type CreateRequest struct {
 func (e *Handler) Create(ctx *gin.Context) {
 	var req CreateRequest
 	if err := ctx.BindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse(err))
 		return
 	}
 
@@ -26,11 +25,9 @@ func (e *Handler) Create(ctx *gin.Context) {
 		Name: req.Name,
 	}
 
-	tx := e.db.Create(&newEvent)
-	if tx.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": tx.Error.Error(),
-		})
+	newEvent, err := e.repository.CreateEvent(newEvent)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, pkg.ErrorResponse(err))
 		return
 	}
 
