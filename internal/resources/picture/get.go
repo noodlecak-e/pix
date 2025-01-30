@@ -8,7 +8,7 @@ import (
 )
 
 func (e *Handler) Get(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id := ctx.Param("picture_id")
 
 	var picture models.Picture
 	tx := e.db.First(&picture, "id = ?", id)

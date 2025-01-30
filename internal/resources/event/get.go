@@ -8,7 +8,7 @@ import (
 )
 
 func (e *Handler) Get(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id := ctx.Param("event_id")
 
 	var event models.Event
 	tx := e.db.First(&event, "id = ?", id)

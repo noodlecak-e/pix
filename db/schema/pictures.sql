@@ -1,8 +1,8 @@
 CREATE TABLE pictures (
-    id VARCHAR(36),
-    event_id VARCHAR(36),
-    user_id VARCHAR(36),
-    image_base64 TEXT,
+    id VARCHAR(36) NOT NULL,
+    event_id VARCHAR(36) NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
+    image_base64 TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP

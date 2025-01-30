@@ -23,17 +23,17 @@ func main() {
 
 	eventHandler := event.NewHandler(db)
 	r.POST("/events", eventHandler.Create)
-	r.GET("/events/:id", eventHandler.Get)
+	r.GET("/events/:event_id", eventHandler.Get)
 	r.GET("/events", eventHandler.BulkGet)
 
 	userHandler := user.NewHandler(db)
 	r.POST("/events/:event_id/users", userHandler.Create)
-	r.GET("/events/:event_id/users/:id", userHandler.Get)
+	r.GET("/events/:event_id/users/:user_id", userHandler.Get)
 	r.GET("/events/:event_id/users", userHandler.BulkGet)
 
 	pictureHandler := picture.NewHandler(db)
 	r.POST("/events/:event_id/users/:user_id/pictures", pictureHandler.Create)
-	r.GET("/events/:event_id/users/:user_id/pictures/:id", pictureHandler.Get)
+	r.GET("/events/:event_id/users/:user_id/pictures/:picture_id", pictureHandler.Get)
 	r.GET("/events/:event_id/users/:user_id/pictures", pictureHandler.BulkGet)
 
 	r.Run()
