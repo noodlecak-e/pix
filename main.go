@@ -7,7 +7,7 @@ import (
 	"github.com/noodlecak-e/pix/internal/repository"
 	"github.com/noodlecak-e/pix/internal/resources/event"
 	"github.com/noodlecak-e/pix/internal/resources/picture"
-	"github.com/noodlecak-e/pix/internal/resources/user"
+	"github.com/noodlecak-e/pix/pkg/files/localstorage"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,21 +20,23 @@ func main() {
 		panic("failed to connect database")
 	}
 
-	responsitory := repository.New(db)
+	repository := repository.New(db)
 
 	r := gin.Default()
 
-	eventHandler := event.NewHandler(*responsitory)
+	eventHandler := event.NewHandler(*repository)
 	r.POST("/events", eventHandler.Create)
 	r.GET("/events/:event_id", eventHandler.Get)
 	r.GET("/events", eventHandler.BulkGet)
 
-	userHandler := user.NewHandler(*responsitory)
-	r.POST("/events/:event_id/users", userHandler.Create)
-	r.GET("/events/:event_id/users/:user_id", userHandler.Get)
-	r.GET("/events/:event_id/users", userHandler.BulkGet)
+	// userHandler := user.NewHandler(*repository)
+	// r.POST("/events/:event_id/users", userHandler.Create)
+	// r.GET("/events/:event_id/users/:user_id", userHandler.Get)
+	// r.GET("/events/:event_id/users", userHandler.BulkGet)
 
-	pictureHandler := picture.NewHandler(*responsitory)
+	storage := localstorage.NewHandler()
+
+	pictureHandler := picture.NewHandler(*repository, storage)
 	r.POST("/events/:event_id/users/:user_id/pictures", pictureHandler.Create)
 	r.GET("/events/:event_id/users/:user_id/pictures/:picture_id", pictureHandler.Get)
 	r.GET("/events/:event_id/users/:user_id/pictures", pictureHandler.BulkGet)

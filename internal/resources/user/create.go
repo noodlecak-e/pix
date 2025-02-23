@@ -10,7 +10,8 @@ import (
 )
 
 type CreateRequest struct {
-	Name string `json:"name" binding:"required"`
+	Name    string `json:"name" binding:"required"`
+	EventID string `json:"event_id" binding:"required"`
 }
 
 func (e *Handler) Create(ctx *gin.Context) {

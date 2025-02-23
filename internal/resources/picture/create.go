@@ -3,24 +3,16 @@ package picture
 import (
 	"errors"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/noodlecak-e/pix/internal/models"
 	"github.com/noodlecak-e/pix/pkg"
+	"github.com/noodlecak-e/pix/pkg/files"
 )
 
-type CreateRequest struct {
-	ImageB64 string `json:"image_base64" binding:"required"`
-}
-
 func (e *Handler) Create(ctx *gin.Context) {
-	var req CreateRequest
-	if err := ctx.BindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse(err))
-		return
-	}
-
 	eventID := ctx.Param("event_id")
 	userID := ctx.Param("user_id")
 
@@ -44,11 +36,30 @@ func (e *Handler) Create(ctx *gin.Context) {
 		return
 	}
 
+	multipartFile, _, err := ctx.Request.FormFile("file")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, pkg.ErrorResponse(err))
+		return
+	}
+	defer multipartFile.Close()
+
+	file, err := files.ConvertToFile(multipartFile, "/tmp/"+uuid.New().String())
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, pkg.ErrorResponse(err))
+		return
+	}
+
+	fullPath, err := e.fileStorage.Create(ctx, []os.File{*file})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, pkg.ErrorResponse(err))
+		return
+	}
+
 	newPicture := models.Picture{
-		ID:          uuid.New().String(),
-		EventID:     eventID,
-		UserID:      userID,
-		ImageBase64: req.ImageB64,
+		ID:        uuid.New().String(),
+		EventID:   eventID,
+		UserID:    userID,
+		ImagePath: fullPath,
 	}
 
 	newPicture, err = e.repository.CreatePicture(newPicture)
