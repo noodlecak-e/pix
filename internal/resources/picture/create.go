@@ -1,9 +1,11 @@
 package picture
 
 import (
+	"database/sql"
 	"errors"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -57,9 +59,11 @@ func (e *Handler) Create(ctx *gin.Context) {
 
 	newPicture := models.Picture{
 		ID:        uuid.New().String(),
-		EventID:   eventID,
-		UserID:    userID,
-		ImagePath: fullPath,
+		EventID:   sql.NullString{String: eventID, Valid: true},
+		UserID:    sql.NullString{String: userID, Valid: true},
+		ImagePath: sql.NullString{String: fullPath, Valid: true},
+		CreatedAt: time.Now(), // FIXME
+		UpdatedAt: time.Now(),
 	}
 
 	newPicture, err = e.repository.CreatePicture(newPicture)

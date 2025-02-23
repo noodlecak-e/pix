@@ -1,6 +1,7 @@
 package user
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,8 +11,7 @@ import (
 )
 
 type CreateRequest struct {
-	Name    string `json:"name" binding:"required"`
-	EventID string `json:"event_id" binding:"required"`
+	Name string `json:"name" binding:"required"`
 }
 
 func (e *Handler) Create(ctx *gin.Context) {
@@ -21,9 +21,12 @@ func (e *Handler) Create(ctx *gin.Context) {
 		return
 	}
 
+	eventID := ctx.Param("event_id")
+
 	newUser := models.User{
-		ID:   uuid.New().String(),
-		Name: req.Name,
+		ID:      uuid.New().String(),
+		Name:    sql.NullString{String: req.Name, Valid: true},
+		EventID: sql.NullString{String: eventID, Valid: true},
 	}
 
 	newUser, err := e.repository.CreateUser(newUser)
@@ -34,6 +37,6 @@ func (e *Handler) Create(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "created user!",
-		"event":   newUser,
+		"user":    newUser,
 	})
 }

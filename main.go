@@ -7,6 +7,7 @@ import (
 	"github.com/noodlecak-e/pix/internal/repository"
 	"github.com/noodlecak-e/pix/internal/resources/event"
 	"github.com/noodlecak-e/pix/internal/resources/picture"
+	"github.com/noodlecak-e/pix/internal/resources/user"
 	"github.com/noodlecak-e/pix/pkg/files/localstorage"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -29,10 +30,10 @@ func main() {
 	r.GET("/events/:event_id", eventHandler.Get)
 	r.GET("/events", eventHandler.BulkGet)
 
-	// userHandler := user.NewHandler(*repository)
-	// r.POST("/events/:event_id/users", userHandler.Create)
-	// r.GET("/events/:event_id/users/:user_id", userHandler.Get)
-	// r.GET("/events/:event_id/users", userHandler.BulkGet)
+	userHandler := user.NewHandler(*repository)
+	r.POST("/events/:event_id/users", userHandler.Create)
+	r.GET("/events/:event_id/users/:user_id", userHandler.Get)
+	r.GET("/events/:event_id/users", userHandler.BulkGet)
 
 	storage := localstorage.NewHandler()
 
